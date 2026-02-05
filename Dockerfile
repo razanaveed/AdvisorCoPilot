@@ -1,50 +1,35 @@
-# ---------- Build stage ----------
-FROM hexpm/elixir:1.15.8-erlang-26.2-debian-bookworm AS build
+# STEP 1: Use a blueprint that DEFINITELY exists
+FROM hexpm/elixir:1.15.8-erlang-26.2.1-debian-bookworm-20240130-slim as builder
 
-ENV MIX_ENV=prod
+# Install build tools
+RUN apt-get update -y && apt-get install -y build-essential git && apt-get clean
+
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y \
-  build-essential \
-  git \
-  nodejs \
-  npm \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mix local.hex --force && mix local.rebar --force
 
+ENV MIX_ENV="prod"
+
+# Install dependencies
 COPY mix.exs mix.lock ./
+RUN mix deps.get --only $MIX_ENV
 COPY config config
-RUN mix deps.get --only prod
 RUN mix deps.compile
 
-COPY assets assets
-RUN cd assets && npm install && npm run build
-
+# Build the app
 COPY priv priv
 COPY lib lib
-
+COPY assets assets
 RUN mix compile
-RUN mix phx.digest
 RUN mix release
 
-
-# ---------- Runtime stage ----------
+# STEP 2: The actual runner
 FROM debian:bookworm-slim
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales ca-certificates libsqlite3-0 && apt-get clean
 
-RUN apt-get update && apt-get install -y \
-  openssl \
-  libstdc++6 \
-  libncurses5 \
-  ca-certificates \
-  && apt-get clean && rm -rf /var/lib/apt/lists/*
+WORKDIR "/app"
+# Matches your app name: advisor_co_pilot
+COPY --from=builder /app/_build/prod/rel/advisor_co_pilot ./
 
-ENV LANG=C.UTF-8
-WORKDIR /app
-
-COPY --from=build /app/_build/prod/rel/advisor_copilot ./
-
-ENV PHX_SERVER=true
-ENV PORT=8080
-
-CMD ["bin/advisor_copilot", "start"]
+RUN mkdir -p /data
+CMD ["/app/bin/server"]
