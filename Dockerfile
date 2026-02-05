@@ -1,5 +1,5 @@
 # STEP 1: Use a blueprint that DEFINITELY exists
-FROM hexpm/elixir:1.15.8-erlang-26.2.1-debian-bookworm-20240130-slim as builder
+FROM hexpm/elixir:1.15.8-erlang-26.2-debian-bookworm AS builder
 
 # Install build tools
 RUN apt-get update -y && apt-get install -y build-essential git && apt-get clean
