@@ -7,7 +7,7 @@ defmodule AdvisorCoPilot.Application do
 
   @impl true
   def start(_type, _args) do
-    if AzvisorCoPilot.Release.migrate() == :ok, do: :ok
+    AdvisorCoPilot.Release.migrate()
     children = [
       AdvisorCoPilotWeb.Telemetry,
       AdvisorCoPilot.Repo,
