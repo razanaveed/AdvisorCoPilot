@@ -1,0 +1,22 @@
+app = "advisor-copilot"
+primary_region = "ord"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[mounts]
+  source = "advisor_data"
+  destination = "/data"
+
+[env]
+  PHX_HOST = "advisor-copilot.fly.dev"
+  PORT = "8080"
+  DATABASE_PATH = "/data/advisor_copilot.db"
+
+[deploy]
+  release_command = "/app/bin/migrate"

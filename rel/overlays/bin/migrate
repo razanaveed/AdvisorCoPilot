@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+cd -P -- "$(dirname -- "$0")"
+exec ./advisor_co_pilot eval AdvisorCoPilot.Release.migrate

@@ -1,0 +1,73 @@
+defmodule AdvisorCoPilotWeb.HomeLive do
+  use AdvisorCoPilotWeb, :live_view
+
+  @impl true
+  def mount(_params, _session, socket) do
+    {:ok,
+     socket
+     |> assign(:page_title, "Advisor CoPilot")}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <Layouts.flash_group flash={@flash} />
+    <div class="px-4 py-10 sm:px-6 sm:py-16 lg:px-8 xl:px-16 xl:py-20">
+      <div class="mx-auto max-w-6xl space-y-10">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold leading-8 tracking-tight">
+              Advisor CoPilot
+            </h1>
+            <p class="mt-2 text-sm text-base-content/70">
+              Prep, run, and review client meetings – powered by real-time insight.
+            </p>
+          </div>
+          <Layouts.theme_toggle />
+        </div>
+
+        <div class="grid gap-8 lg:grid-cols-3">
+          <section class="card bg-base-100 shadow-sm border border-base-200 lg:col-span-2">
+            <div class="card-body space-y-4">
+              <header class="flex items-center justify-between gap-4">
+                <div>
+                  <h2 class="text-base font-semibold">Meetings</h2>
+                  <p class="text-sm text-base-content/70">
+                    Manage client meetings, jump into prep, or start a live capture.
+                  </p>
+                </div>
+                <.button navigate={~p"/meetings/new"} class="btn-sm">
+                  New Meeting
+                </.button>
+              </header>
+
+              <.live_component
+                module={AdvisorCoPilotWeb.MeetingsDashboardComponent}
+                id="meetings-dashboard"
+              />
+            </div>
+          </section>
+
+          <section class="card bg-base-100 shadow-sm border border-base-200">
+            <div class="card-body space-y-4">
+              <h2 class="text-base font-semibold">Quick Actions</h2>
+              <div class="space-y-2 text-sm">
+                <p class="text-base-content/70">
+                  - Use <span class="font-semibold">Prep</span> to review CRM context and talking points.
+                </p>
+                <p class="text-base-content/70">
+                  - Use <span class="font-semibold">Live Meeting</span> to capture and tag transcript lines in real time.
+                </p>
+                <p class="text-base-content/70">
+                  All data is stored in your local SQLite database via Ecto.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    """
+  end
+end
+
